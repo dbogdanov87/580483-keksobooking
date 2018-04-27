@@ -237,9 +237,7 @@ var renderPopup = function (object) {
   popup.querySelector('.popup__text--time').textContent = 'Заезд после ' +
     object.offer.checkin + ', выезд до ' + object.offer.checkout;
   // удаляем все feature
-  while (popup.querySelector('.popup__feature')) {
-    popup.querySelector('.popup__feature').remove();
-  }
+  popup.querySelector('.popup__features').innerHTML = '';
   // добавляем feature автора
   for (var j = 0; j < object.offer.features.length; j++) {
     var features = makeElement('li', 'popup__feature');
@@ -248,10 +246,11 @@ var renderPopup = function (object) {
   }
   popup.querySelector('.popup__description').textContent = object.offer.description;
   // добавляем картиники и пути к ним
+  var photos = popup.querySelector('.popup__photos');
   for (var k = 1; k < object.offer.photos.length; k++) {
     popup.querySelector('.popup__photo').src = object.offer.photos[k];
     var photo = popup.querySelector('.popup__photo').cloneNode();
-    popup.querySelector('.popup__photos').appendChild(photo);
+    photos.appendChild(photo);
   }
   return popup;
 };
