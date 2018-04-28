@@ -211,10 +211,16 @@ var disabledOrEnabledFieldSet = function (flag) {
 
 disabledOrEnabledFieldSet(true);
 
-var enableAdForm = function () {
+var enableAdFormAndFields = function () {
   var adForm = document.querySelector('.ad-form');
   adForm.classList.remove('ad-form--disabled');
+  disabledOrEnabledFieldSet(false);
 };
+
+var buttonPin = document.querySelector('.map__pin');
+buttonPin.addEventListener('click', function (evt) {
+
+});
 
 var makeElement = function (tagName, className, text) {
   var element = document.createElement(tagName);
@@ -225,6 +231,8 @@ var makeElement = function (tagName, className, text) {
   return element;
 };
 
+var map = document.querySelector('.map');
+
 var renderPin = function (object) {
   var elementPin = map.querySelector('.map__pin--main').cloneNode(true);
   elementPin.style.left = object.location.x + 'px';
@@ -234,7 +242,10 @@ var renderPin = function (object) {
   return elementPin;
 };
 
-var map = document.querySelector('.map');
+var fragment = document.createDocumentFragment();
+for (var i = 0; i < similarAds.length; i++) {
+  fragment.appendChild(renderPin(similarAds[i]));
+}
 
 var template = document.querySelector('#element-template').content;
 
@@ -271,7 +282,42 @@ var renderPopup = function (object) {
   return popup;
 };
 
-var fragment = document.createDocumentFragment();
-for (var i = 0; i < similarAds.length; i++) {
-  fragment.appendChild(renderPin(similarAds[i]));
-}
+// отрывает форму для редактирования и записывает адрес target pin
+var buttonMapPin = document.querySelector('.map__pin');
+var onStartButtonMapPinMoseUp = function (evt) {
+  map.classList.remove('map--faded');
+  enableAdFormAndFields();
+  document.querySelector('.map__pins').appendChild(fragment);
+  document.querySelector('#address').value = evt.x + ', ' + evt.y;
+};
+buttonMapPin.addEventListener('mouseup', onStartButtonMapPinMoseUp);
+
+// по url картинки ищет обхект в масииве объектов авторов
+var returnObjectAuthor = function (evt) {
+  var avatarUrl;
+  var authorObject;
+  // если у таргета есть ссылка на картинку,
+  // то пробуем найти адрес типа img/avatars/user01.png
+  if (evt.target.src) {
+    try {
+      avatarUrl = evt.target.src.match('img\\/[a-z]*\\/[a-z\\d.]*')[0];
+    } catch (e) {
+      avatarUrl = '';
+    }
+    // перебираем массив объекто и выбираем по ссылке аватрки
+    for (var g = 0; g < similarAds.length; g++) {
+      if (similarAds[g].author.avatar === avatarUrl) {
+        authorObject = similarAds[g];
+      }
+    }
+  }
+  return authorObject;
+};
+
+var onAvatarClick = function (evt) {
+  if (returnObjectAuthor(evt)) {
+    fragment.appendChild(renderPopup(returnObjectAuthor(evt)));
+    document.querySelector('.map__pins').appendChild(fragment);
+  }
+};
+document.addEventListener('click', onAvatarClick);
