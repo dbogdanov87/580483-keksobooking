@@ -202,6 +202,20 @@ var similarAds = [
   }
 ];
 
+var disabledOrEnabledFieldSet = function (flag) {
+  var all = document.querySelectorAll('fieldset');
+  for (var l = 0; l < all.length; l++) {
+    all[l].disabled = flag;
+  }
+};
+
+disabledOrEnabledFieldSet(true);
+
+var enableAdForm = function () {
+  var adForm = document.querySelector('.ad-form');
+  adForm.classList.remove('ad-form--disabled');
+};
+
 var makeElement = function (tagName, className, text) {
   var element = document.createElement(tagName);
   element.classList.add(className);
@@ -221,7 +235,6 @@ var renderPin = function (object) {
 };
 
 var map = document.querySelector('.map');
-map.classList.remove('map--faded');
 
 var template = document.querySelector('#element-template').content;
 
@@ -247,10 +260,13 @@ var renderPopup = function (object) {
   popup.querySelector('.popup__description').textContent = object.offer.description;
   // добавляем картиники и пути к ним
   var photos = popup.querySelector('.popup__photos');
-  for (var k = 1; k < object.offer.photos.length; k++) {
-    popup.querySelector('.popup__photo').src = object.offer.photos[k];
+  for (var k = 0; k < object.offer.photos.length; k++) {
     var photo = popup.querySelector('.popup__photo').cloneNode();
+    if (k === 0) {
+      photos.innerHTML = '';
+    }
     photos.appendChild(photo);
+    popup.querySelector('.popup__photo').src = object.offer.photos[k];
   }
   return popup;
 };
@@ -259,5 +275,3 @@ var fragment = document.createDocumentFragment();
 for (var i = 0; i < similarAds.length; i++) {
   fragment.appendChild(renderPin(similarAds[i]));
 }
-fragment.appendChild(renderPopup(similarAds[NUMBER_AUTHOR]));
-document.querySelector('.map__pins').appendChild(fragment);
