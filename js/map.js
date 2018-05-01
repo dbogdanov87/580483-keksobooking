@@ -1,6 +1,6 @@
 'use strict';
 
-var NUMBER_AUTHOR = 1;
+var ESC_KEYCODE = 27;
 var PRICE_ADD_INFO = '₽/ночь';
 
 var similarAds = [
@@ -217,11 +217,6 @@ var enableAdFormAndFields = function () {
   disabledOrEnabledFieldSet(false);
 };
 
-var buttonPin = document.querySelector('.map__pin');
-buttonPin.addEventListener('click', function (evt) {
-
-});
-
 var makeElement = function (tagName, className, text) {
   var element = document.createElement(tagName);
   element.classList.add(className);
@@ -231,26 +226,32 @@ var makeElement = function (tagName, className, text) {
   return element;
 };
 
+var divPins = document.querySelector('.map__pins');
 var map = document.querySelector('.map');
+var pin = document.querySelector('.map__pin');
 
-var renderPin = function (object) {
-  var elementPin = map.querySelector('.map__pin--main').cloneNode(true);
+var createPin = function (object, index) {
+  var elementPin = pin.cloneNode(true);
   elementPin.style.left = object.location.x + 'px';
   elementPin.style.top = object.location.y + 'px';
   elementPin.querySelector('img').src = object.author.avatar;
   elementPin.querySelector('img').alt = object.offer.title;
+  elementPin.setAttribute('value', index);
   return elementPin;
 };
 
 var fragment = document.createDocumentFragment();
-for (var i = 0; i < similarAds.length; i++) {
-  fragment.appendChild(renderPin(similarAds[i]));
-}
+var renderPins = function () {
+  for (var i = 0; i < similarAds.length; i++) {
+    fragment.appendChild(createPin(similarAds[i], i));
+  }
+  divPins.appendChild(fragment);
+};
 
-var template = document.querySelector('#element-template').content;
-
-var renderPopup = function (object) {
-  var popup = template.cloneNode(true);
+var createPopup = function (object) {
+  closePopup();
+  var popup = document.querySelector('#element-template')
+      .content.querySelector('.map__card').cloneNode(true);
   popup.querySelector('.popup__avatar').src = object.author.avatar;
   popup.querySelector('.popup__title').textContent = object.offer.title;
   popup.querySelector('.popup__text--address').textContent = object.offer.address;
@@ -273,6 +274,7 @@ var renderPopup = function (object) {
   var photos = popup.querySelector('.popup__photos');
   for (var k = 0; k < object.offer.photos.length; k++) {
     var photo = popup.querySelector('.popup__photo').cloneNode();
+    // на первом шаге удаляем все img
     if (k === 0) {
       photos.innerHTML = '';
     }
@@ -282,42 +284,51 @@ var renderPopup = function (object) {
   return popup;
 };
 
-// отрывает форму для редактирования и записывает адрес target pin
-var buttonMapPin = document.querySelector('.map__pin');
+var renderPopup = function (object) {
+  fragment.appendChild(createPopup(object));
+  divPins.appendChild(fragment);
+};
+
+var closePopup = function () {
+  var popupElement = document.querySelector('.map__card');
+  if (popupElement) {
+    popupElement.remove();
+  }
+};
+
+var onPopupEscPress = function (evt) {
+  if (evt.keyCode === ESC_KEYCODE) {
+    closePopup();
+  }
+};
+
+var onClosePopupClick = function () {
+  var closePopupElement = document.querySelector('.popup__close');
+  closePopupElement.addEventListener('click', function () {
+    closePopup();
+  });
+  document.addEventListener('keydown', onPopupEscPress);
+};
+
+// отрывает форму для редактирования, рендерит пины и вешает на них обработчики
 var onStartButtonMapPinMoseUp = function (evt) {
   map.classList.remove('map--faded');
   enableAdFormAndFields();
-  document.querySelector('.map__pins').appendChild(fragment);
   document.querySelector('#address').value = evt.x + ', ' + evt.y;
-};
-buttonMapPin.addEventListener('mouseup', onStartButtonMapPinMoseUp);
-
-// по url картинки ищет обхект в масииве объектов авторов
-var returnObjectAuthor = function (evt) {
-  var avatarUrl;
-  var authorObject;
-  // если у таргета есть ссылка на картинку,
-  // то пробуем найти адрес типа img/avatars/user01.png
-  if (evt.target.src) {
-    try {
-      avatarUrl = evt.target.src.match('img\\/[a-z]*\\/[a-z\\d.]*')[0];
-    } catch (e) {
-      avatarUrl = '';
-    }
-    // перебираем массив объекто и выбираем по ссылке аватрки
-    for (var g = 0; g < similarAds.length; g++) {
-      if (similarAds[g].author.avatar === avatarUrl) {
-        authorObject = similarAds[g];
-      }
-    }
-  }
-  return authorObject;
-};
-
-var onAvatarClick = function (evt) {
-  if (returnObjectAuthor(evt)) {
-    fragment.appendChild(renderPopup(returnObjectAuthor(evt)));
-    document.querySelector('.map__pins').appendChild(fragment);
+  renderPins();
+  var buttonPins = document.querySelectorAll('.map__pin');
+  for (var g = 0; g < buttonPins.length; g++) {
+    buttonPins[g].addEventListener('click', onPinClick);
   }
 };
-document.addEventListener('click', onAvatarClick);
+pin.addEventListener('mouseup', onStartButtonMapPinMoseUp);
+
+// при клике на пин отображаем попап, если есть value у пина
+var onPinClick = function (evt) {
+  pin.removeEventListener('mouseup', onStartButtonMapPinMoseUp);
+  var valueTarget = evt.currentTarget.getAttribute('value');
+  if (valueTarget) {
+    renderPopup(similarAds[valueTarget]);
+    onClosePopupClick();
+  }
+};
