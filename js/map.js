@@ -1,6 +1,6 @@
 'use strict';
 
-var NUMBER_AUTHOR = 1;
+var ESC_KEYCODE = 27;
 var PRICE_ADD_INFO = '₽/ночь';
 
 var similarAds = [
@@ -202,6 +202,21 @@ var similarAds = [
   }
 ];
 
+var disabledOrEnabledFieldSet = function (flag) {
+  var all = document.querySelectorAll('fieldset');
+  for (var l = 0; l < all.length; l++) {
+    all[l].disabled = flag;
+  }
+};
+
+disabledOrEnabledFieldSet(true);
+
+var enableAdFormAndFields = function () {
+  var adForm = document.querySelector('.ad-form');
+  adForm.classList.remove('ad-form--disabled');
+  disabledOrEnabledFieldSet(false);
+};
+
 var makeElement = function (tagName, className, text) {
   var element = document.createElement(tagName);
   element.classList.add(className);
@@ -211,22 +226,32 @@ var makeElement = function (tagName, className, text) {
   return element;
 };
 
-var renderPin = function (object) {
-  var elementPin = map.querySelector('.map__pin--main').cloneNode(true);
+var divPins = document.querySelector('.map__pins');
+var map = document.querySelector('.map');
+var pin = document.querySelector('.map__pin');
+
+var createPin = function (object, index) {
+  var elementPin = pin.cloneNode(true);
   elementPin.style.left = object.location.x + 'px';
   elementPin.style.top = object.location.y + 'px';
   elementPin.querySelector('img').src = object.author.avatar;
   elementPin.querySelector('img').alt = object.offer.title;
+  elementPin.setAttribute('value', index);
   return elementPin;
 };
 
-var map = document.querySelector('.map');
-map.classList.remove('map--faded');
+var fragment = document.createDocumentFragment();
+var renderPins = function () {
+  for (var i = 0; i < similarAds.length; i++) {
+    fragment.appendChild(createPin(similarAds[i], i));
+  }
+  divPins.appendChild(fragment);
+};
 
-var template = document.querySelector('#element-template').content;
-
-var renderPopup = function (object) {
-  var popup = template.cloneNode(true);
+var createPopup = function (object) {
+  closePopup();
+  var popup = document.querySelector('#element-template')
+      .content.querySelector('.map__card').cloneNode(true);
   popup.querySelector('.popup__avatar').src = object.author.avatar;
   popup.querySelector('.popup__title').textContent = object.offer.title;
   popup.querySelector('.popup__text--address').textContent = object.offer.address;
@@ -247,17 +272,63 @@ var renderPopup = function (object) {
   popup.querySelector('.popup__description').textContent = object.offer.description;
   // добавляем картиники и пути к ним
   var photos = popup.querySelector('.popup__photos');
-  for (var k = 1; k < object.offer.photos.length; k++) {
-    popup.querySelector('.popup__photo').src = object.offer.photos[k];
+  for (var k = 0; k < object.offer.photos.length; k++) {
     var photo = popup.querySelector('.popup__photo').cloneNode();
+    // на первом шаге удаляем все img
+    if (k === 0) {
+      photos.innerHTML = '';
+    }
     photos.appendChild(photo);
+    popup.querySelector('.popup__photo').src = object.offer.photos[k];
   }
   return popup;
 };
 
-var fragment = document.createDocumentFragment();
-for (var i = 0; i < similarAds.length; i++) {
-  fragment.appendChild(renderPin(similarAds[i]));
-}
-fragment.appendChild(renderPopup(similarAds[NUMBER_AUTHOR]));
-document.querySelector('.map__pins').appendChild(fragment);
+var renderPopup = function (object) {
+  fragment.appendChild(createPopup(object));
+  divPins.appendChild(fragment);
+};
+
+var closePopup = function () {
+  var popupElement = document.querySelector('.map__card');
+  if (popupElement) {
+    popupElement.remove();
+  }
+};
+
+var onPopupEscPress = function (evt) {
+  if (evt.keyCode === ESC_KEYCODE) {
+    closePopup();
+  }
+};
+
+var onClosePopupClick = function () {
+  var closePopupElement = document.querySelector('.popup__close');
+  closePopupElement.addEventListener('click', function () {
+    closePopup();
+  });
+  document.addEventListener('keydown', onPopupEscPress);
+};
+
+// отрывает форму для редактирования, рендерит пины и вешает на них обработчики
+var onStartButtonMapPinMoseUp = function (evt) {
+  map.classList.remove('map--faded');
+  enableAdFormAndFields();
+  document.querySelector('#address').value = evt.x + ', ' + evt.y;
+  renderPins();
+  var buttonPins = document.querySelectorAll('.map__pin');
+  for (var g = 0; g < buttonPins.length; g++) {
+    buttonPins[g].addEventListener('click', onPinClick);
+  }
+};
+pin.addEventListener('mouseup', onStartButtonMapPinMoseUp);
+
+// при клике на пин отображаем попап, если есть value у пина
+var onPinClick = function (evt) {
+  pin.removeEventListener('mouseup', onStartButtonMapPinMoseUp);
+  var valueTarget = evt.currentTarget.getAttribute('value');
+  if (valueTarget) {
+    renderPopup(similarAds[valueTarget]);
+    onClosePopupClick();
+  }
+};
