@@ -332,3 +332,52 @@ var onPinClick = function (evt) {
     onClosePopupClick();
   }
 };
+
+map.classList.remove('map--faded');
+var userFormElement = document.querySelector('.notice');
+var typeSelectElement = userFormElement.querySelector('#type');
+var priceInputElement = userFormElement.querySelector('#price');
+var addressInputElement = userFormElement.querySelector('#address');
+var timeInSelectElement = userFormElement.querySelector('#timein');
+var timeOutSelectElement = userFormElement.querySelector('#timeout');
+var roomsSelectElement = userFormElement.querySelector('#room_number');
+var capacitySelectElement = userFormElement.querySelector('#capacity');
+
+var capacityOptionsElements = capacitySelectElement.querySelectorAll('option');
+
+var synchronizesSelectElementsValue = function (changedSelect, syncedSelect) {
+  var selectedValue = changedSelect.options[changedSelect.selectedIndex].value;
+
+  for (var i = 0; i < syncedSelect.length; i += 1) {
+    if (syncedSelect[i].value === selectedValue) {
+      syncedSelect[i].selected = true;
+      break;
+    }
+  }
+};
+
+timeInSelectElement.addEventListener('change', function () {
+  synchronizesSelectElementsValue(timeInSelectElement, timeOutSelectElement);
+});
+
+timeOutSelectElement.addEventListener('change', function () {
+  synchronizesSelectElementsValue(timeOutSelectElement, timeInSelectElement);
+});
+
+var minPriceHousing = {
+  bungalo: '0',
+  flat: '1000',
+  house: '5000',
+  palace: '10000'};
+
+var changeMinPriceByTypeHousing = function () {
+  var selectedType = typeSelectElement.options[typeSelectElement.selectedIndex].value;
+  var selectedPrice = minPriceHousing[selectedType];
+
+  priceInputElement.min = selectedPrice;
+  priceInputElement.placeholder = selectedPrice;
+};
+
+typeSelectElement.addEventListener('change', function () {
+  changeMinPriceByTypeHousing();
+});
