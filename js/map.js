@@ -452,3 +452,62 @@ document.querySelector('.ad-form__reset').addEventListener('click', function () 
   pin.addEventListener('mouseup', onStartButtonMapPinMoseUp);
   disableAdFormAndFields();
 });
+
+pin.addEventListener('mousedown', function (evt) {
+  evt.preventDefault();
+
+  var startCoords = {
+    x: evt.clientX,
+    y: evt.clientY
+  };
+
+  var onMouseMove = function (moveEvt) {
+    moveEvt.preventDefault();
+
+    var shift = {
+      x: startCoords.x - moveEvt.clientX,
+      y: startCoords.y - moveEvt.clientY
+    };
+
+    startCoords = {
+      x: moveEvt.clientX,
+      y: moveEvt.clientY
+    };
+    var pinLimitsCoords = {
+      y: {maxTop: 150,
+        maxBottom: 500
+      },
+      x: {maxLeft: 0,
+        maxRight: map.clientWidth - pin.offsetWidth // ширина окна мапы - ширина пина
+      }
+    };
+
+    pin.style.top = (pin.offsetTop - shift.y) + 'px';
+    pin.style.left = (pin.offsetLeft - shift.x) + 'px';
+    // если высота поднятия пина больше ограничения, то берем ограничение
+    if (parseFloat(pin.style.top) < pinLimitsCoords.y.maxTop) {
+      pin.style.top = pinLimitsCoords.y.maxTop + 'px';
+    // если высота опускания пина меньше ограничения, то берем ограничение
+    } else if (parseFloat(pin.style.top) > pinLimitsCoords.y.maxBottom) {
+      pin.style.top = pinLimitsCoords.y.maxBottom + 'px';
+    }
+    // если пытаемся вывести за левую границу мапы, то выставляем ограничение
+    if (parseFloat(pin.style.left) < pinLimitsCoords.x.maxLeft) {
+      pin.style.left = pinLimitsCoords.x.maxLeft + 'px';
+    // если пытаемся вывести за правую границу, то выставляем ограничение
+    } else if (parseFloat(pin.style.left) > pinLimitsCoords.x.maxRight) {
+      pin.style.left = pinLimitsCoords.x.maxRight + 'px';
+    }
+  };
+
+  var onMouseUp = function (upEvt) {
+    upEvt.preventDefault();
+
+    document.removeEventListener('mousemove', onMouseMove);
+    document.removeEventListener('mouseup', onMouseUp);
+    setAddress(getPinPosition());
+  };
+
+  document.addEventListener('mousemove', onMouseMove);
+  document.addEventListener('mouseup', onMouseUp);
+});
