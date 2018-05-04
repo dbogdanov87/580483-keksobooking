@@ -235,10 +235,10 @@ var makeElement = function (tagName, className, text) {
 
 var divPins = document.querySelector('.map__pins');
 var map = document.querySelector('.map');
-var pin = document.querySelector('.map__pin');
+var mainPin = document.querySelector('.map__pin--main');
 
 var createPin = function (object, index) {
-  var elementPin = pin.cloneNode(true);
+  var elementPin = mainPin.cloneNode(true);
   elementPin.querySelector('svg').remove();
   elementPin.classList.remove('map__pin--main');
   elementPin.classList.add('pin');
@@ -330,11 +330,11 @@ var onStartButtonMapPinMoseUp = function () {
     buttonPins[g].addEventListener('click', onPinClick);
   }
 };
-pin.addEventListener('mouseup', onStartButtonMapPinMoseUp);
+mainPin.addEventListener('mouseup', onStartButtonMapPinMoseUp);
 
 // при клике на пин отображаем попап, если есть value у пина
 var onPinClick = function (evt) {
-  pin.removeEventListener('mouseup', onStartButtonMapPinMoseUp);
+  mainPin.removeEventListener('mouseup', onStartButtonMapPinMoseUp);
   var valueTarget = evt.currentTarget.getAttribute('value');
   if (valueTarget) {
     renderPopup(similarAds[valueTarget]);
@@ -358,16 +358,23 @@ var timeOutSelectElement = userFormElement.querySelector('#timeout');
 var roomsSelectElement = userFormElement.querySelector('#room_number');
 var capacitySelectElement = userFormElement.querySelector('#capacity');
 
-var getPinPosition = function () {
-  return pin.offsetLeft + ', ' + pin.offsetTop;
+var getMainPinPosition = function () {
+  return mainPin.offsetLeft + ', ' + mainPin.offsetTop;
 };
 
 var setAddress = function (address) {
   addressInputElement.value = address;
 };
 
-var addressPin = getPinPosition();
-setAddress(addressPin);
+var addressMainPin = getMainPinPosition();
+setAddress(addressMainPin);
+
+// принимает строку вида - '300, 200'
+var setOriginalLocationMainPin = function (address) {
+  var addressLocation = address.split(', ');
+  mainPin.style.left = addressLocation[0] + 'px';
+  mainPin.style.top = addressLocation[1] + 'px';
+};
 
 
 var capacityOptionsElements = capacitySelectElement.querySelectorAll('option');
@@ -447,13 +454,15 @@ synchronizesRoomsWithCapacity();
 
 document.querySelector('.ad-form__reset').addEventListener('click', function () {
   map.classList.add('map--faded');
+  setAddress(addressMainPin);
+  setOriginalLocationMainPin(addressMainPin);
   removePins();
   closePopup();
-  pin.addEventListener('mouseup', onStartButtonMapPinMoseUp);
+  mainPin.addEventListener('mouseup', onStartButtonMapPinMoseUp);
   disableAdFormAndFields();
 });
 
-pin.addEventListener('mousedown', function (evt) {
+mainPin.addEventListener('mousedown', function (evt) {
   evt.preventDefault();
 
   var startCoords = {
@@ -478,25 +487,25 @@ pin.addEventListener('mousedown', function (evt) {
         maxBottom: 500
       },
       x: {maxLeft: 0,
-        maxRight: map.clientWidth - pin.offsetWidth // ширина окна мапы - ширина пина
+        maxRight: map.clientWidth - mainPin.offsetWidth // ширина окна мапы - ширина пина
       }
     };
 
-    pin.style.top = (pin.offsetTop - shift.y) + 'px';
-    pin.style.left = (pin.offsetLeft - shift.x) + 'px';
+    mainPin.style.top = (mainPin.offsetTop - shift.y) + 'px';
+    mainPin.style.left = (mainPin.offsetLeft - shift.x) + 'px';
     // если высота поднятия пина больше ограничения, то берем ограничение
-    if (parseFloat(pin.style.top) < pinLimitsCoords.y.maxTop) {
-      pin.style.top = pinLimitsCoords.y.maxTop + 'px';
+    if (parseFloat(mainPin.style.top) < pinLimitsCoords.y.maxTop) {
+      mainPin.style.top = pinLimitsCoords.y.maxTop + 'px';
     // если высота опускания пина меньше ограничения, то берем ограничение
-    } else if (parseFloat(pin.style.top) > pinLimitsCoords.y.maxBottom) {
-      pin.style.top = pinLimitsCoords.y.maxBottom + 'px';
+    } else if (parseFloat(mainPin.style.top) > pinLimitsCoords.y.maxBottom) {
+      mainPin.style.top = pinLimitsCoords.y.maxBottom + 'px';
     }
     // если пытаемся вывести за левую границу мапы, то выставляем ограничение
-    if (parseFloat(pin.style.left) < pinLimitsCoords.x.maxLeft) {
-      pin.style.left = pinLimitsCoords.x.maxLeft + 'px';
+    if (parseFloat(mainPin.style.left) < pinLimitsCoords.x.maxLeft) {
+      mainPin.style.left = pinLimitsCoords.x.maxLeft + 'px';
     // если пытаемся вывести за правую границу, то выставляем ограничение
-    } else if (parseFloat(pin.style.left) > pinLimitsCoords.x.maxRight) {
-      pin.style.left = pinLimitsCoords.x.maxRight + 'px';
+    } else if (parseFloat(mainPin.style.left) > pinLimitsCoords.x.maxRight) {
+      mainPin.style.left = pinLimitsCoords.x.maxRight + 'px';
     }
   };
 
@@ -505,7 +514,7 @@ pin.addEventListener('mousedown', function (evt) {
 
     document.removeEventListener('mousemove', onMouseMove);
     document.removeEventListener('mouseup', onMouseUp);
-    setAddress(getPinPosition());
+    setAddress(getMainPinPosition());
   };
 
   document.addEventListener('mousemove', onMouseMove);
