@@ -425,8 +425,8 @@ var disableLimitCapacity = function () {
     capacityOptionsElements[INDEX_NOT_FOR_GUESTS].disabled = false;
   } else {
     capacityOptionsElements.forEach(function (option) {
-      var optionNumber = parseFloat(option.value);
-      if (optionNumber <= parseFloat(selectedRoom) && optionNumber !== 0) {
+      var optionNumber = parseInt(option.value, 10);
+      if (optionNumber <= parseInt(selectedRoom, 10) && optionNumber !== 0) {
         option.disabled = false;
       }
     });
@@ -494,17 +494,17 @@ mainPin.addEventListener('mousedown', function (evt) {
     mainPin.style.top = (mainPin.offsetTop - shift.y) + 'px';
     mainPin.style.left = (mainPin.offsetLeft - shift.x) + 'px';
     // если высота поднятия пина больше ограничения, то берем ограничение
-    if (parseFloat(mainPin.style.top) < pinLimitsCoords.y.maxTop) {
+    if (parseInt(mainPin.style.top, 10) < pinLimitsCoords.y.maxTop) {
       mainPin.style.top = pinLimitsCoords.y.maxTop + 'px';
-    // если высота опускания пина меньше ограничения, то берем ограничение
-    } else if (parseFloat(mainPin.style.top) > pinLimitsCoords.y.maxBottom) {
+      // если высота опускания пина меньше ограничения, то берем ограничение
+    } else if (parseInt(mainPin.style.top, 10) > pinLimitsCoords.y.maxBottom) {
       mainPin.style.top = pinLimitsCoords.y.maxBottom + 'px';
     }
     // если пытаемся вывести за левую границу мапы, то выставляем ограничение
-    if (parseFloat(mainPin.style.left) < pinLimitsCoords.x.maxLeft) {
+    if (parseInt(mainPin.style.left, 10) < pinLimitsCoords.x.maxLeft) {
       mainPin.style.left = pinLimitsCoords.x.maxLeft + 'px';
-    // если пытаемся вывести за правую границу, то выставляем ограничение
-    } else if (parseFloat(mainPin.style.left) > pinLimitsCoords.x.maxRight) {
+      // если пытаемся вывести за правую границу, то выставляем ограничение
+    } else if (parseInt(mainPin.style.left, 10) > pinLimitsCoords.x.maxRight) {
       mainPin.style.left = pinLimitsCoords.x.maxRight + 'px';
     }
   };
