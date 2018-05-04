@@ -235,10 +235,10 @@ var makeElement = function (tagName, className, text) {
 
 var divPins = document.querySelector('.map__pins');
 var map = document.querySelector('.map');
-var pin = document.querySelector('.map__pin');
+var mainPin = document.querySelector('.map__pin--main');
 
 var createPin = function (object, index) {
-  var elementPin = pin.cloneNode(true);
+  var elementPin = mainPin.cloneNode(true);
   elementPin.querySelector('svg').remove();
   elementPin.classList.remove('map__pin--main');
   elementPin.classList.add('pin');
@@ -330,11 +330,11 @@ var onStartButtonMapPinMoseUp = function () {
     buttonPins[g].addEventListener('click', onPinClick);
   }
 };
-pin.addEventListener('mouseup', onStartButtonMapPinMoseUp);
+mainPin.addEventListener('mouseup', onStartButtonMapPinMoseUp);
 
 // при клике на пин отображаем попап, если есть value у пина
 var onPinClick = function (evt) {
-  pin.removeEventListener('mouseup', onStartButtonMapPinMoseUp);
+  mainPin.removeEventListener('mouseup', onStartButtonMapPinMoseUp);
   var valueTarget = evt.currentTarget.getAttribute('value');
   if (valueTarget) {
     renderPopup(similarAds[valueTarget]);
@@ -358,16 +358,23 @@ var timeOutSelectElement = userFormElement.querySelector('#timeout');
 var roomsSelectElement = userFormElement.querySelector('#room_number');
 var capacitySelectElement = userFormElement.querySelector('#capacity');
 
-var getPinPosition = function () {
-  return pin.offsetLeft + ', ' + pin.offsetTop;
+var getMainPinPosition = function () {
+  return mainPin.offsetLeft + ', ' + mainPin.offsetTop;
 };
 
 var setAddress = function (address) {
   addressInputElement.value = address;
 };
 
-var addressPin = getPinPosition();
-setAddress(addressPin);
+var addressMainPin = getMainPinPosition();
+setAddress(addressMainPin);
+
+// принимает строку вида - '300, 200'
+var setOriginalLocationMainPin = function (address) {
+  var addressLocation = address.split(', ');
+  mainPin.style.left = addressLocation[0] + 'px';
+  mainPin.style.top = addressLocation[1] + 'px';
+};
 
 
 var capacityOptionsElements = capacitySelectElement.querySelectorAll('option');
@@ -418,8 +425,8 @@ var disableLimitCapacity = function () {
     capacityOptionsElements[INDEX_NOT_FOR_GUESTS].disabled = false;
   } else {
     capacityOptionsElements.forEach(function (option) {
-      var optionNumber = parseFloat(option.value);
-      if (optionNumber <= parseFloat(selectedRoom) && optionNumber !== 0) {
+      var optionNumber = parseInt(option.value, 10);
+      if (optionNumber <= parseInt(selectedRoom, 10) && optionNumber !== 0) {
         option.disabled = false;
       }
     });
@@ -447,8 +454,69 @@ synchronizesRoomsWithCapacity();
 
 document.querySelector('.ad-form__reset').addEventListener('click', function () {
   map.classList.add('map--faded');
+  setAddress(addressMainPin);
+  setOriginalLocationMainPin(addressMainPin);
   removePins();
   closePopup();
-  pin.addEventListener('mouseup', onStartButtonMapPinMoseUp);
+  mainPin.addEventListener('mouseup', onStartButtonMapPinMoseUp);
   disableAdFormAndFields();
+});
+
+mainPin.addEventListener('mousedown', function (evt) {
+  evt.preventDefault();
+
+  var startCoords = {
+    x: evt.clientX,
+    y: evt.clientY
+  };
+
+  var onMouseMove = function (moveEvt) {
+    moveEvt.preventDefault();
+
+    var shift = {
+      x: startCoords.x - moveEvt.clientX,
+      y: startCoords.y - moveEvt.clientY
+    };
+
+    startCoords = {
+      x: moveEvt.clientX,
+      y: moveEvt.clientY
+    };
+    var pinLimitsCoords = {
+      y: {maxTop: 150,
+        maxBottom: 500
+      },
+      x: {maxLeft: 0,
+        maxRight: map.clientWidth - mainPin.offsetWidth // ширина окна мапы - ширина пина
+      }
+    };
+
+    mainPin.style.top = (mainPin.offsetTop - shift.y) + 'px';
+    mainPin.style.left = (mainPin.offsetLeft - shift.x) + 'px';
+    // если высота поднятия пина больше ограничения, то берем ограничение
+    if (parseInt(mainPin.style.top, 10) < pinLimitsCoords.y.maxTop) {
+      mainPin.style.top = pinLimitsCoords.y.maxTop + 'px';
+      // если высота опускания пина меньше ограничения, то берем ограничение
+    } else if (parseInt(mainPin.style.top, 10) > pinLimitsCoords.y.maxBottom) {
+      mainPin.style.top = pinLimitsCoords.y.maxBottom + 'px';
+    }
+    // если пытаемся вывести за левую границу мапы, то выставляем ограничение
+    if (parseInt(mainPin.style.left, 10) < pinLimitsCoords.x.maxLeft) {
+      mainPin.style.left = pinLimitsCoords.x.maxLeft + 'px';
+      // если пытаемся вывести за правую границу, то выставляем ограничение
+    } else if (parseInt(mainPin.style.left, 10) > pinLimitsCoords.x.maxRight) {
+      mainPin.style.left = pinLimitsCoords.x.maxRight + 'px';
+    }
+  };
+
+  var onMouseUp = function (upEvt) {
+    upEvt.preventDefault();
+
+    document.removeEventListener('mousemove', onMouseMove);
+    document.removeEventListener('mouseup', onMouseUp);
+    setAddress(getMainPinPosition());
+  };
+
+  document.addEventListener('mousemove', onMouseMove);
+  document.addEventListener('mouseup', onMouseUp);
 });
