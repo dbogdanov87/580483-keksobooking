@@ -8,13 +8,15 @@
   var userFormElement = document.querySelector('.notice');
   var typeSelectElement = userFormElement.querySelector('#type');
   var priceInputElement = userFormElement.querySelector('#price');
-  var addressInputElement = userFormElement.querySelector('#address');
   var timeInSelectElement = userFormElement.querySelector('#timein');
   var timeOutSelectElement = userFormElement.querySelector('#timeout');
   var roomsSelectElement = userFormElement.querySelector('#room_number');
   var capacitySelectElement = userFormElement.querySelector('#capacity');
 
   var capacityOptionsElements = capacitySelectElement.querySelectorAll('option');
+
+  var addressMainPin = window.utils.getMainPinPosition();
+  window.utils.setAddress(addressMainPin);
 
   var synchronizesSelectElementsValue = function (changedSelect, syncedSelect) {
     var selectedValue = changedSelect.options[changedSelect.selectedIndex].value;
@@ -70,13 +72,6 @@
     }
   };
 
-  var setAddress = function (address) {
-    addressInputElement.value = address;
-  };
-
-  var addressMainPin = getMainPinPosition();
-  setAddress(addressMainPin);
-
   var synchronizesRoomsWithCapacity = function () {
     // выставить не для гостей, если выбрано кол-во комнат - 100, иначе синхронизируем
     var roomOptionValue = roomsSelectElement.options[roomsSelectElement.selectedIndex].value;
@@ -95,14 +90,4 @@
 
   changeMinPriceByTypeHousing();
   synchronizesRoomsWithCapacity();
-
-  document.querySelector('.ad-form__reset').addEventListener('click', function () {
-    map.classList.add('map--faded');
-    setAddress(addressMainPin);
-    setOriginalLocationMainPin(addressMainPin);
-    removePins();
-    closePopup();
-    mainPin.addEventListener('mouseup', onStartButtonMapPinMoseUp);
-    disableAdFormAndFields();
-  });
 })();
