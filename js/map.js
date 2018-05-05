@@ -117,11 +117,14 @@ var setOriginalLocationMainPin = function (address) {
 var addressMainPin = window.utils.getMainPinPosition();
 
 document.querySelector('.ad-form__reset').addEventListener('click', function () {
-  map.classList.add('map--faded');
+  adForm.reset();
+  window.form.changeMinPriceByTypeHousing();
+  window.form.synchronizesRoomsWithCapacity();
   window.utils.setAddress(addressMainPin);
   setOriginalLocationMainPin(addressMainPin);
   removePins();
   closePopup();
+  map.classList.add('map--faded');
   mainPin.addEventListener('mouseup', onStartButtonMapPinMoseUp);
   disableAdFormAndFields();
 });
@@ -196,11 +199,11 @@ var removeErrorMessages = function () {
 };
 
 var uploadSuccess = function () {
-  messageSuccess.classList.remove('hidden');
   adForm.reset();
   window.utils.setAddress(addressMainPin);
+  window.form.changeMinPriceByTypeHousing();
   window.form.synchronizesRoomsWithCapacity();
-  window.form.synchronizesRoomsWithCapacity();
+  messageSuccess.classList.remove('hidden');
   setTimeout(hideSuccessMessages, TIMEOUT_MESSAGES);
 };
 
