@@ -2,6 +2,27 @@
 
 var ESC_KEYCODE = 27;
 
+var closePopup = function () {
+  var popupElement = document.querySelector('.map__card');
+  if (popupElement) {
+    popupElement.remove();
+  }
+};
+
+var onPopupEscPress = function (evt) {
+  if (evt.keyCode === ESC_KEYCODE) {
+    closePopup();
+  }
+};
+
+var onClosePopupClick = function () {
+  var closePopupElement = document.querySelector('.popup__close');
+  closePopupElement.addEventListener('click', function () {
+    closePopup();
+  });
+  document.addEventListener('keydown', onPopupEscPress);
+};
+
 var disabledOrEnabledFieldSet = function (flag) {
   var all = document.querySelectorAll('fieldset');
   for (var l = 0; l < all.length; l++) {
@@ -27,11 +48,22 @@ var map = document.querySelector('.map');
 var mainPin = document.querySelector('.map__pin--main');
 
 var fragment = document.createDocumentFragment();
-var renderPins = function () {
-  for (var i = 0; i < window.similarAds.length; i++) {
-    fragment.appendChild(window.createPin(window.similarAds[i], i));
+
+var renderPins = function (listPins) {
+  for (var i = 0; i < listPins.length; i++) {
+    fragment.appendChild(window.createPin(listPins[i], i));
   }
   divPins.appendChild(fragment);
+};
+
+var onLoadSuccessPins = function (listPins) {
+  renderPins(listPins);
+};
+
+var onLoadErrorPins = function (textError) {
+  window.utils.createDivWithErrorMessages(textError);
+  map.classList.add('map--faded');
+  disabledOrEnabledFieldSet(true);
 };
 
 var renderPopup = function (object) {
@@ -39,32 +71,11 @@ var renderPopup = function (object) {
   divPins.appendChild(fragment);
 };
 
-var closePopup = function () {
-  var popupElement = document.querySelector('.map__card');
-  if (popupElement) {
-    popupElement.remove();
-  }
-};
-
-var onPopupEscPress = function (evt) {
-  if (evt.keyCode === ESC_KEYCODE) {
-    closePopup();
-  }
-};
-
-var onClosePopupClick = function () {
-  var closePopupElement = document.querySelector('.popup__close');
-  closePopupElement.addEventListener('click', function () {
-    closePopup();
-  });
-  document.addEventListener('keydown', onPopupEscPress);
-};
-
 // отрывает форму для редактирования, рендерит пины и вешает на них обработчики
 var onStartButtonMapPinMoseUp = function () {
+  window.backend.loadData(onLoadSuccessPins, onLoadErrorPins);
   map.classList.remove('map--faded');
   enableAdFormAndFields();
-  renderPins();
   var buttonPins = document.querySelectorAll('.map__pin');
   for (var g = 0; g < buttonPins.length; g++) {
     buttonPins[g].addEventListener('click', onPinClick);
