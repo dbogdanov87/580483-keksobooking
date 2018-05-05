@@ -1,6 +1,7 @@
 'use strict';
 
 var ESC_KEYCODE = 27;
+var TIMEOUT_MESSAGES = 5000;
 
 var closePopup = function () {
   var popupElement = document.querySelector('.map__card');
@@ -56,9 +57,13 @@ var renderPins = function (listPins) {
   divPins.appendChild(fragment);
 };
 
+var renderPopup = function (object) {
+  fragment.appendChild(window.createPopup(object));
+  divPins.appendChild(fragment);
+};
+
 // похожие объявления с сервера
 var similarAds;
-
 
 var onLoadSuccess = function (data) {
   similarAds = data;
@@ -73,11 +78,7 @@ var onLoadError = function (textError) {
   window.utils.createDivWithErrorMessage(textError);
   map.classList.add('map--faded');
   disabledOrEnabledFieldSet(true);
-};
-
-var renderPopup = function (object) {
-  fragment.appendChild(window.createPopup(object));
-  divPins.appendChild(fragment);
+  setTimeout(removeErrorMessages, TIMEOUT_MESSAGES);
 };
 
 // отрывает форму для редактирования, рендерит пины и вешает на них обработчики
@@ -182,4 +183,33 @@ mainPin.addEventListener('mousedown', function (evt) {
 
   document.addEventListener('mousemove', onMouseMove);
   document.addEventListener('mouseup', onMouseUp);
+});
+
+var messageSuccess = document.querySelector('.success');
+
+var hideSuccessMessages = function () {
+  messageSuccess.classList.add('hidden');
+};
+
+var removeErrorMessages = function () {
+  document.querySelector('.error').remove();
+};
+
+var uploadSuccess = function () {
+  messageSuccess.classList.remove('hidden');
+  adForm.reset();
+  window.utils.setAddress(addressMainPin);
+  window.form.synchronizesRoomsWithCapacity();
+  window.form.synchronizesRoomsWithCapacity();
+  setTimeout(hideSuccessMessages, TIMEOUT_MESSAGES);
+};
+
+var uploadError = function (textError) {
+  window.utils.createDivWithErrorMessage(textError);
+  setTimeout(removeErrorMessages, TIMEOUT_MESSAGES);
+};
+
+adForm.addEventListener('submit', function (evt) {
+  window.backend.uploadData(new FormData(adForm), uploadSuccess, uploadError);
+  evt.preventDefault();
 });

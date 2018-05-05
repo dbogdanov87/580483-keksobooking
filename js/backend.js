@@ -35,7 +35,7 @@
       response.open('GET', DOWNLOAD_URL);
       response.send();
     },
-    uploadDate: function (data, onSuccess, onError) {
+    uploadData: function (data, onSuccess, onError) {
       var response = processesResponseFromServer(onSuccess, onError);
       response.open('POST', UPLOAD_URL);
       response.send(data);
