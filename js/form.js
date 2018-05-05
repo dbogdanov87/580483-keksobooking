@@ -43,16 +43,29 @@
     house: '5000',
     palace: '10000'};
 
-  var changeMinPriceByTypeHousing = function () {
-    var selectedType = typeSelectElement.options[typeSelectElement.selectedIndex].value;
-    var selectedPrice = minPriceHousing[selectedType];
+  window.form = {
+    changeMinPriceByTypeHousing: function () {
+      var selectedType = typeSelectElement.options[typeSelectElement.selectedIndex].value;
+      var selectedPrice = minPriceHousing[selectedType];
 
-    priceInputElement.min = selectedPrice;
-    priceInputElement.placeholder = selectedPrice;
+      priceInputElement.min = selectedPrice;
+      priceInputElement.placeholder = selectedPrice;
+    },
+    synchronizesRoomsWithCapacity: function () {
+      // выставить не для гостей, если выбрано кол-во комнат - 100, иначе синхронизируем
+      var roomOptionValue = roomsSelectElement.options[roomsSelectElement.selectedIndex].value;
+      if (roomOptionValue === VALUE_NOT_FOR_GUESTS) {
+        var optionNotForGuests = capacitySelectElement.querySelector('option[value="0"]');
+        optionNotForGuests.selected = true;
+      } else {
+        synchronizesSelectElementsValue(roomsSelectElement, capacitySelectElement);
+      }
+      disableLimitCapacity();
+    }
   };
 
   typeSelectElement.addEventListener('change', function () {
-    changeMinPriceByTypeHousing();
+    window.form.changeMinPriceByTypeHousing();
   });
 
   var disableLimitCapacity = function () {
@@ -72,22 +85,10 @@
     }
   };
 
-  var synchronizesRoomsWithCapacity = function () {
-    // выставить не для гостей, если выбрано кол-во комнат - 100, иначе синхронизируем
-    var roomOptionValue = roomsSelectElement.options[roomsSelectElement.selectedIndex].value;
-    if (roomOptionValue === VALUE_NOT_FOR_GUESTS) {
-      var optionNotForGuests = capacitySelectElement.querySelector('option[value="0"]');
-      optionNotForGuests.selected = true;
-    } else {
-      synchronizesSelectElementsValue(roomsSelectElement, capacitySelectElement);
-    }
-    disableLimitCapacity();
-  };
-
   roomsSelectElement.addEventListener('change', function () {
-    synchronizesRoomsWithCapacity(roomsSelectElement, capacitySelectElement);
+    window.form.synchronizesRoomsWithCapacity(roomsSelectElement, capacitySelectElement);
   });
 
-  changeMinPriceByTypeHousing();
-  synchronizesRoomsWithCapacity();
+  window.form.changeMinPriceByTypeHousing();
+  window.form.synchronizesRoomsWithCapacity();
 })();
