@@ -56,12 +56,21 @@ var renderPins = function (listPins) {
   divPins.appendChild(fragment);
 };
 
-var onLoadSuccessPins = function (listPins) {
-  renderPins(listPins);
+// похожие объявления с сервера
+var similarAds;
+
+
+var onLoadSuccess = function (data) {
+  similarAds = data;
+  renderPins(data);
+  var buttonPins = document.querySelectorAll('.pin');
+  for (var g = 0; g < buttonPins.length; g++) {
+    buttonPins[g].addEventListener('click', onPinClick);
+  }
 };
 
-var onLoadErrorPins = function (textError) {
-  window.utils.createDivWithErrorMessages(textError);
+var onLoadError = function (textError) {
+  window.utils.createDivWithErrorMessage(textError);
   map.classList.add('map--faded');
   disabledOrEnabledFieldSet(true);
 };
@@ -73,13 +82,9 @@ var renderPopup = function (object) {
 
 // отрывает форму для редактирования, рендерит пины и вешает на них обработчики
 var onStartButtonMapPinMoseUp = function () {
-  window.backend.loadData(onLoadSuccessPins, onLoadErrorPins);
+  window.backend.loadData(onLoadSuccess, onLoadError);
   map.classList.remove('map--faded');
   enableAdFormAndFields();
-  var buttonPins = document.querySelectorAll('.map__pin');
-  for (var g = 0; g < buttonPins.length; g++) {
-    buttonPins[g].addEventListener('click', onPinClick);
-  }
 };
 mainPin.addEventListener('mouseup', onStartButtonMapPinMoseUp);
 
@@ -89,7 +94,7 @@ var onPinClick = function (evt) {
   var valueTarget = evt.currentTarget.getAttribute('value');
   if (valueTarget) {
     closePopup();
-    renderPopup(window.similarAds[valueTarget]);
+    renderPopup(similarAds[valueTarget]);
     onClosePopupClick();
   }
 };

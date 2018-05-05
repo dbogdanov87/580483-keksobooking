@@ -15,7 +15,7 @@
       }
       return element;
     },
-    createDivWithErrorMessages: function (textError) {
+    createDivWithErrorMessage: function (textError) {
       var elementErrorMessage = window.utils.makeElement('div', 'popup', textError);
       elementErrorMessage.style = 'z-index: 10; top: 50%; left: 50%; margin-top: -50px; ' +
         'margin-left: -150px; padding: 10px 10px 20px; background-color: #ffffff;';
