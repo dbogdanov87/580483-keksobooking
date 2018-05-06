@@ -13,11 +13,10 @@
 
   var compareFeatures = function (dataFeatures, featuresCheckbox) {
     // создает массив features, если чекбокс выбран
-    var listFeaturesValues = Array.from(featuresCheckbox).filter(function (checkedBox) {
-      return checkedBox.checked;
-    }).map(function (checkedBox) {
-      return checkedBox.value;
-    });
+    var listFeaturesValues = [];
+    for (var i = 0; i < featuresCheckbox.length; i++) {
+      listFeaturesValues.push(featuresCheckbox[i].value);
+    }
 
     var isCheckedDataFeatures = function (feature) {
       return dataFeatures.indexOf(feature) > -1;
@@ -44,7 +43,8 @@
     var valueHousingRooms = elementsMapFiltersFrom.querySelector('#housing-rooms').value;
     var valueHousingGuests = elementsMapFiltersFrom.querySelector('#housing-guests').value;
     var elementsCheckboxFeatures = elementsMapFiltersFrom.querySelector('#housing-features').
-        querySelectorAll('input[type=checkbox]');
+        querySelectorAll('input[type=checkbox]:checked');
+    //console.log(elementsCheckboxFeatures);
 
     var filteredSimilarAds = listObjects.filter(function (it) {
       return compareType(it.offer.type, valueHousingType) &&
