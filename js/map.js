@@ -2,6 +2,11 @@
 
 var ESC_KEYCODE = 27;
 var TIMEOUT_MESSAGES = 5000;
+var COUNT_RENDER_PINS = 5;
+
+var limitSimilarAds = function (data) {
+  return data.splice(0, COUNT_RENDER_PINS);
+};
 
 var closePopup = function () {
   var popupElement = document.querySelector('.map__card');
@@ -65,9 +70,12 @@ var renderPopup = function (object) {
 // похожие объявления с сервера
 var similarAds;
 
+var limitedSimilarAds;
+
 var onLoadSuccess = function (data) {
   similarAds = data;
-  renderPins(data);
+  limitedSimilarAds = limitSimilarAds(data);
+  renderPins(limitedSimilarAds);
   var buttonPins = document.querySelectorAll('.pin');
   for (var g = 0; g < buttonPins.length; g++) {
     buttonPins[g].addEventListener('click', onPinClick);
@@ -216,3 +224,16 @@ adForm.addEventListener('submit', function (evt) {
   window.backend.uploadData(new FormData(adForm), uploadSuccess, uploadError);
   evt.preventDefault();
 });
+
+
+var elementsMapFiltersFrom = document.querySelector('.map__filters');
+var elementSelect = elementsMapFiltersFrom.querySelector('select');
+
+elementSelect.addEventListener('change', function (evt) {
+  console.log(evt.target);
+});
+// var filterSimilarAds = function (evt) {
+//   var pins = similarAds.filter(function (it) {
+//     return evt.
+//   })
+// };
