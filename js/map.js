@@ -101,7 +101,6 @@ mainPin.addEventListener('mouseup', onStartButtonMapPinMoseUp);
 // при клике на пин отображаем попап, если есть value у пина
 var onPinClick = function (evt) {
   mainPin.removeEventListener('mouseup', onStartButtonMapPinMoseUp);
-  console.log(limitedFilteredSimilarAds);
   var valueTarget = evt.currentTarget.getAttribute('value');
   if (valueTarget) {
     closePopup();
