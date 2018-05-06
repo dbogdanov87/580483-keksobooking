@@ -44,7 +44,6 @@
     var valueHousingGuests = elementsMapFiltersFrom.querySelector('#housing-guests').value;
     var elementsCheckboxFeatures = elementsMapFiltersFrom.querySelector('#housing-features').
         querySelectorAll('input[type=checkbox]:checked');
-    //console.log(elementsCheckboxFeatures);
 
     var filteredSimilarAds = listObjects.filter(function (it) {
       return compareType(it.offer.type, valueHousingType) &&

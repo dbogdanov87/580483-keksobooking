@@ -28,15 +28,16 @@
       }
       elementPopup.querySelector('.popup__description').textContent = object.offer.description;
       // добавляем картиники и пути к ним
-      var photos = elementPopup.querySelector('.popup__photos');
+      var elementPhotos = elementPopup.querySelector('.popup__photos');
+      elementPhotos.innerHTML = '';
       for (var k = 0; k < object.offer.photos.length; k++) {
-        var photo = elementPopup.querySelector('.popup__photo').cloneNode();
-        // на первом шаге удаляем все img
-        if (k === 0) {
-          photos.innerHTML = '';
-        }
-        photos.appendChild(photo);
-        elementPopup.querySelector('.popup__photo').src = object.offer.photos[k];
+        var elementPhoto = window.utils.makeElement('img', 'popup__photo');
+        elementPhoto.src = object.offer.photos[k];
+        elementPhoto.style.marginTop = '5px';
+        elementPhoto.width = '45';
+        elementPhoto.height = '40';
+        elementPhoto.alt = 'Фотография жилья';
+        elementPhotos.appendChild(elementPhoto);
       }
       return elementPopup;
     },
