@@ -3,8 +3,9 @@
 var ESC_KEYCODE = 27;
 var TIMEOUT_MESSAGES = 5000;
 var COUNT_RENDER_PINS = 5;
+var INTERVAL_RATTLING = 500;
 
-var limitSimilarAds = function (data) {
+var trimData = function (data) {
   return data.splice(0, COUNT_RENDER_PINS);
 };
 
@@ -67,14 +68,11 @@ var renderPopup = function (object) {
   divPins.appendChild(fragment);
 };
 
-// похожие объявления с сервера
-var similarAds;
-
+// похожие объявления с сервера с ограничением COUNT_RENDER_PINS
 var limitedSimilarAds;
 
 var onLoadSuccess = function (data) {
-  similarAds = data;
-  limitedSimilarAds = limitSimilarAds(data);
+  limitedSimilarAds = trimData(data);
   renderPins(limitedSimilarAds);
   var buttonPins = document.querySelectorAll('.pin');
   for (var g = 0; g < buttonPins.length; g++) {
@@ -103,7 +101,7 @@ var onPinClick = function (evt) {
   var valueTarget = evt.currentTarget.getAttribute('value');
   if (valueTarget) {
     closePopup();
-    renderPopup(similarAds[valueTarget]);
+    renderPopup(limitedSimilarAds[valueTarget]);
     onClosePopupClick();
   }
 };
@@ -225,15 +223,72 @@ adForm.addEventListener('submit', function (evt) {
   evt.preventDefault();
 });
 
+var FILTER_HOUSING_PRICE = {
+  low: 10000,
+  high: 50000
+};
+
+var returnStringValueByPrice = function (offerPrice) {
+  if (offerPrice < FILTER_HOUSING_PRICE.low) {
+    return 'low';
+  } else if (offerPrice >= FILTER_HOUSING_PRICE.high) {
+    return 'high';
+  } else {
+    return 'middle';
+  }
+};
+
 
 var elementsMapFiltersFrom = document.querySelector('.map__filters');
-var elementSelect = elementsMapFiltersFrom.querySelector('select');
 
-elementSelect.addEventListener('change', function (evt) {
-  console.log(evt.target);
+var compareType = function (dataType, filtersType) {
+  return filtersType === 'any' || filtersType === dataType.toString();
+};
+
+var compareFeatures = function (dataFeatures, featuresCheckbox) {
+  // создает массив features, если чекбокс выбран
+  var listFeaturesValues = Array.from(featuresCheckbox).filter(function (checkedBox) {
+    return checkedBox.checked;
+  }).map(function (checkedBox) {
+    return checkedBox.value;
+  });
+
+  var isCheckedDataFeatures = function (feature) {
+    return dataFeatures.indexOf(feature) > -1;
+  };
+  return listFeaturesValues.every(isCheckedDataFeatures);
+};
+
+var lastTimeout;
+
+var debounce = function (callback) {
+  if (lastTimeout) {
+    window.clearTimeout(lastTimeout);
+  }
+  lastTimeout = window.setTimeout(callback, INTERVAL_RATTLING);
+};
+
+var onChangeFilter = function () {
+  removePins();
+  closePopup();
+
+  var valueHousingType = elementsMapFiltersFrom.querySelector('#housing-type').value;
+  var valueHousingPrice = elementsMapFiltersFrom.querySelector('#housing-price').value;
+  var valueHousingRooms = elementsMapFiltersFrom.querySelector('#housing-rooms').value;
+  var valueHousingGuests = elementsMapFiltersFrom.querySelector('#housing-guests').value;
+  var elementsCheckboxFeatures = elementsMapFiltersFrom.querySelector('#housing-features').
+      querySelectorAll('input[type=checkbox]');
+
+  var filterSimilarAds = limitedSimilarAds.filter(function (it) {
+    return compareType(it.offer.type, valueHousingType) &&
+      compareType(returnStringValueByPrice(it.offer.price), valueHousingPrice) &&
+      compareType(it.offer.rooms, valueHousingRooms) &&
+      compareType(it.offer.guests, valueHousingGuests) &&
+      compareFeatures(it.offer.features, elementsCheckboxFeatures);
+  });
+  renderPins(filterSimilarAds);
+};
+
+elementsMapFiltersFrom.addEventListener('change', function () {
+  debounce(onChangeFilter);
 });
-// var filterSimilarAds = function (evt) {
-//   var pins = similarAds.filter(function (it) {
-//     return evt.
-//   })
-// };
