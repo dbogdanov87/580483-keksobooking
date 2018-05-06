@@ -61,6 +61,10 @@ var renderPins = function (listPins) {
     fragment.appendChild(window.createPin(listPins[i], i));
   }
   divPins.appendChild(fragment);
+  var buttonPins = document.querySelectorAll('.pin');
+  for (var g = 0; g < buttonPins.length; g++) {
+    buttonPins[g].addEventListener('click', onPinClick);
+  }
 };
 
 var renderPopup = function (object) {
@@ -68,16 +72,15 @@ var renderPopup = function (object) {
   divPins.appendChild(fragment);
 };
 
+// похожие объявления с сервера
+var similarAds;
 // похожие объявления с сервера с ограничением COUNT_RENDER_PINS
-var limitedSimilarAds;
+var limitedFilteredSimilarAds;
 
 var onLoadSuccess = function (data) {
-  limitedSimilarAds = trimData(data);
-  renderPins(limitedSimilarAds);
-  var buttonPins = document.querySelectorAll('.pin');
-  for (var g = 0; g < buttonPins.length; g++) {
-    buttonPins[g].addEventListener('click', onPinClick);
-  }
+  similarAds = data;
+  limitedFilteredSimilarAds = trimData(data);
+  renderPins(limitedFilteredSimilarAds);
 };
 
 var onLoadError = function (textError) {
@@ -98,10 +101,11 @@ mainPin.addEventListener('mouseup', onStartButtonMapPinMoseUp);
 // при клике на пин отображаем попап, если есть value у пина
 var onPinClick = function (evt) {
   mainPin.removeEventListener('mouseup', onStartButtonMapPinMoseUp);
+  console.log(limitedFilteredSimilarAds);
   var valueTarget = evt.currentTarget.getAttribute('value');
   if (valueTarget) {
     closePopup();
-    renderPopup(limitedSimilarAds[valueTarget]);
+    renderPopup(limitedFilteredSimilarAds[valueTarget]);
     onClosePopupClick();
   }
 };
@@ -279,14 +283,15 @@ var onChangeFilter = function () {
   var elementsCheckboxFeatures = elementsMapFiltersFrom.querySelector('#housing-features').
       querySelectorAll('input[type=checkbox]');
 
-  var filterSimilarAds = limitedSimilarAds.filter(function (it) {
+  var filteredSimilarAds = similarAds.filter(function (it) {
     return compareType(it.offer.type, valueHousingType) &&
       compareType(returnStringValueByPrice(it.offer.price), valueHousingPrice) &&
       compareType(it.offer.rooms, valueHousingRooms) &&
       compareType(it.offer.guests, valueHousingGuests) &&
       compareFeatures(it.offer.features, elementsCheckboxFeatures);
   });
-  renderPins(filterSimilarAds);
+  limitedFilteredSimilarAds = trimData(filteredSimilarAds);
+  renderPins(limitedFilteredSimilarAds);
 };
 
 elementsMapFiltersFrom.addEventListener('change', function () {
