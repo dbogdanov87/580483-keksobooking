@@ -1,11 +1,18 @@
 'use strict';
 
 (function () {
-  var addressInputElement = document.querySelector('#address');
   var mainPin = document.querySelector('.map__pin--main');
+  var HEIGHT_TIP = 22;
+  var HALF_PIN = parseInt((mainPin.clientWidth / 2), 10);
+  var PIN_HEIGHT_WITH_TIP = mainPin.clientHeight + HEIGHT_TIP;
+  var addressInputElement = document.querySelector('#address');
+
   window.utils = {
-    getMainPinPosition: function () {
-      return mainPin.offsetLeft + ', ' + mainPin.offsetTop;
+    getMainPinPositionTip: function () {
+      return {
+        x: mainPin.offsetLeft + HALF_PIN,
+        y: mainPin.offsetTop + PIN_HEIGHT_WITH_TIP
+      };
     },
     makeElement: function (tagName, className, text) {
       var element = document.createElement(tagName);
@@ -54,8 +61,8 @@
       });
     },
 
-    setAddress: function (address) {
-      addressInputElement.value = address;
+    setAddress: function (coords) {
+      addressInputElement.value = coords.x + ', ' + coords.y;
     },
     trimData: function (data, limit) {
       return data.slice(0, limit);

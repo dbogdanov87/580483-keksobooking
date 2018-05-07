@@ -53,27 +53,35 @@
   };
   mainPin.addEventListener('mouseup', onStartButtonMapPinMoseUp);
 
-  // принимает строку вида - '300, 200'
-  var setOriginalLocationMainPin = function (address) {
-    var addressLocation = address.split(', ');
-    mainPin.style.left = addressLocation[0] + 'px';
-    mainPin.style.top = addressLocation[1] + 'px';
+  var getOriginalLocationMainPin = function () {
+    return {
+      x: mainPin.offsetLeft,
+      y: mainPin.offsetTop
+    };
   };
+
+  var originalLocationMainPin = getOriginalLocationMainPin();
+
+  // принимает объект вида - coords {x: 300, y:200}'
+  var setOriginalLocationMainPin = function () {
+    mainPin.style.left = originalLocationMainPin.x + 'px';
+    mainPin.style.top = originalLocationMainPin.y + 'px';
+  };
+
+  var addressOriginalTip = window.utils.getMainPinPositionTip();
 
   var resetsPageToOriginalState = function () {
     adForm.reset();
     window.form.changeMinPriceByTypeHousing();
     window.form.synchronizesRoomsWithCapacity();
-    window.utils.setAddress(addressMainPin);
-    setOriginalLocationMainPin(addressMainPin);
+    window.utils.setAddress(addressOriginalTip);
+    setOriginalLocationMainPin(getOriginalLocationMainPin());
     window.utils.removePins();
     window.utils.closePopup();
     map.classList.add('map--faded');
     mainPin.addEventListener('mouseup', onStartButtonMapPinMoseUp);
     disableAdFormAndFields();
   };
-
-  var addressMainPin = window.utils.getMainPinPosition();
 
   document.querySelector('.ad-form__reset').addEventListener('click', function () {
     resetsPageToOriginalState();
@@ -131,7 +139,7 @@
 
       document.removeEventListener('mousemove', onMouseMove);
       document.removeEventListener('mouseup', onMouseUp);
-      window.utils.setAddress(window.utils.getMainPinPosition());
+      window.utils.setAddress(window.utils.getMainPinPositionTip());
     };
 
     document.addEventListener('mousemove', onMouseMove);

@@ -15,12 +15,13 @@
 
   var capacityOptionsElements = capacitySelectElement.querySelectorAll('option');
 
-  var addressMainPin = window.utils.getMainPinPosition();
+  var addressMainPin = window.utils.getMainPinPositionTip();
   window.utils.setAddress(addressMainPin);
 
   var synchronizesSelectElementsValue = function (changedSelect, syncedSelect) {
     var selectedValue = changedSelect.options[changedSelect.selectedIndex].value;
 
+    // оставил цикл for из за использования конструкции break
     for (var i = 0; i < syncedSelect.length; i++) {
       if (syncedSelect[i].value === selectedValue) {
         syncedSelect[i].selected = true;
