@@ -60,9 +60,7 @@
     mainPin.style.top = addressLocation[1] + 'px';
   };
 
-  var addressMainPin = window.utils.getMainPinPosition();
-
-  document.querySelector('.ad-form__reset').addEventListener('click', function () {
+  var resetsPageToOriginalState = function () {
     adForm.reset();
     window.form.changeMinPriceByTypeHousing();
     window.form.synchronizesRoomsWithCapacity();
@@ -73,6 +71,12 @@
     map.classList.add('map--faded');
     mainPin.addEventListener('mouseup', onStartButtonMapPinMoseUp);
     disableAdFormAndFields();
+  };
+
+  var addressMainPin = window.utils.getMainPinPosition();
+
+  document.querySelector('.ad-form__reset').addEventListener('click', function () {
+    resetsPageToOriginalState();
   });
 
   mainPin.addEventListener('mousedown', function (evt) {
@@ -145,10 +149,7 @@
   };
 
   var uploadSuccess = function () {
-    adForm.reset();
-    window.utils.setAddress(addressMainPin);
-    window.form.changeMinPriceByTypeHousing();
-    window.form.synchronizesRoomsWithCapacity();
+    resetsPageToOriginalState();
     messageSuccess.classList.remove('hidden');
     setTimeout(hideSuccessMessages, TIMEOUT_MESSAGES);
   };
