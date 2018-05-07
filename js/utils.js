@@ -54,13 +54,6 @@
       });
       document.addEventListener('keydown', window.utils.onPopupEscPress);
     },
-    removePins: function () {
-      var createdPins = document.querySelectorAll('.pin');
-      createdPins.forEach(function (pinForRemove) {
-        pinForRemove.remove();
-      });
-    },
-
     setAddress: function (coords) {
       addressInputElement.value = coords.x + ', ' + coords.y;
     },

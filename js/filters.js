@@ -34,7 +34,7 @@
   };
 
   window.onChangeFilter = function (listObjects, limitObjects) {
-    window.utils.removePins();
+    window.pin.removePins();
     window.utils.closePopup();
 
     var valueHousingType = elementsMapFiltersFrom.querySelector('#housing-type').value;

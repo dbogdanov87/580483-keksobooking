@@ -28,6 +28,12 @@
         window.utils.onClosePopupClick();
       }
     },
+    removePins: function () {
+      var createdPins = document.querySelectorAll('.pin');
+      createdPins.forEach(function (pinForRemove) {
+        pinForRemove.remove();
+      });
+    },
     renderPins: function (listObjects) {
       similarAds = listObjects;
       listObjects.forEach(function (object, index) {

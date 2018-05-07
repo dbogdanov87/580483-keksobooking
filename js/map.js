@@ -76,7 +76,7 @@
     window.form.synchronizesRoomsWithCapacity();
     window.utils.setAddress(addressOriginalTip);
     setOriginalLocationMainPin(getOriginalLocationMainPin());
-    window.utils.removePins();
+    window.pin.removePins();
     window.utils.closePopup();
     map.classList.add('map--faded');
     mainPin.addEventListener('mouseup', onStartButtonMapPinMoseUp);
