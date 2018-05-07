@@ -29,9 +29,8 @@
       return 'low';
     } else if (offerPrice >= FILTER_HOUSING_PRICE.high) {
       return 'high';
-    } else {
-      return 'middle';
     }
+    return 'middle';
   };
 
   window.onChangeFilter = function (listObjects, limitObjects) {
