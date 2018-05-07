@@ -58,7 +58,7 @@
       addressInputElement.value = address;
     },
     trimData: function (data, limit) {
-      return data.splice(0, limit);
+      return data.slice(0, limit);
     }
   };
 })();

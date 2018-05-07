@@ -21,7 +21,7 @@
   var synchronizesSelectElementsValue = function (changedSelect, syncedSelect) {
     var selectedValue = changedSelect.options[changedSelect.selectedIndex].value;
 
-    for (var i = 0; i < syncedSelect.length; i += 1) {
+    for (var i = 0; i < syncedSelect.length; i++) {
       if (syncedSelect[i].value === selectedValue) {
         syncedSelect[i].selected = true;
         break;
