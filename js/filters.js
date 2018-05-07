@@ -14,9 +14,9 @@
   var compareFeatures = function (dataFeatures, featuresCheckbox) {
     // создает массив features, если чекбокс выбран
     var listFeaturesValues = [];
-    for (var i = 0; i < featuresCheckbox.length; i++) {
-      listFeaturesValues.push(featuresCheckbox[i].value);
-    }
+    featuresCheckbox.forEach(function (feature) {
+      listFeaturesValues.push(feature.value);
+    });
 
     var isCheckedDataFeatures = function (feature) {
       return dataFeatures.indexOf(feature) > -1;

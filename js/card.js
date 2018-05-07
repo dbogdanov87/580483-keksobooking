@@ -21,24 +21,24 @@
       // удаляем все feature
       elementPopup.querySelector('.popup__features').innerHTML = '';
       // добавляем feature автора
-      for (var j = 0; j < object.offer.features.length; j++) {
+      object.offer.features.forEach(function (feature) {
         var features = window.utils.makeElement('li', 'popup__feature');
-        features.classList.add('popup__feature--' + object.offer.features[j]);
+        features.classList.add('popup__feature--' + feature);
         elementPopup.querySelector('.popup__features').appendChild(features);
-      }
+      });
       elementPopup.querySelector('.popup__description').textContent = object.offer.description;
       // добавляем картиники и пути к ним
       var elementPhotos = elementPopup.querySelector('.popup__photos');
       elementPhotos.innerHTML = '';
-      for (var k = 0; k < object.offer.photos.length; k++) {
+      object.offer.photos.forEach(function (photo) {
         var elementPhoto = window.utils.makeElement('img', 'popup__photo');
-        elementPhoto.src = object.offer.photos[k];
+        elementPhoto.src = photo;
         elementPhoto.style.marginTop = '5px';
         elementPhoto.width = '45';
         elementPhoto.height = '40';
         elementPhoto.alt = 'Фотография жилья';
         elementPhotos.appendChild(elementPhoto);
-      }
+      });
       return elementPopup;
     },
     renderPopup: function (object) {

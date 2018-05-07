@@ -5,10 +5,10 @@
   var INTERVAL_RATTLING = 500;
 
   var disabledOrEnabledFieldSet = function (flag) {
-    var all = document.querySelectorAll('fieldset');
-    for (var l = 0; l < all.length; l++) {
-      all[l].disabled = flag;
-    }
+    var allFieldSet = document.querySelectorAll('fieldset');
+    allFieldSet.forEach(function (field) {
+      field.disabled = flag;
+    });
   };
 
   disabledOrEnabledFieldSet(true);

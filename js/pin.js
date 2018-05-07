@@ -29,14 +29,14 @@
     },
     renderPins: function (listObjects) {
       similarAds = listObjects;
-      for (var i = 0; i < listObjects.length; i++) {
-        fragment.appendChild(window.pin.createPin(listObjects[i], i));
-      }
+      listObjects.forEach(function (object, index) {
+        fragment.appendChild(window.pin.createPin(object, index));
+      });
       divPins.appendChild(fragment);
       var buttonPins = document.querySelectorAll('.pin');
-      for (var g = 0; g < buttonPins.length; g++) {
-        buttonPins[g].addEventListener('click', window.pin.onPinClick);
-      }
+      buttonPins.forEach(function (buttonPin) {
+        buttonPin.addEventListener('click', window.pin.onPinClick);
+      });
     }
   };
 })();
