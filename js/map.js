@@ -50,8 +50,9 @@
     window.backend.loadData(onLoadSuccess, onLoadError);
     map.classList.remove('map--faded');
     enableAdFormAndFields();
+    document.removeEventListener('mouseup', onStartButtonMapPinMoseUp);
   };
-  mainPin.addEventListener('mouseup', onStartButtonMapPinMoseUp);
+  document.addEventListener('mouseup', onStartButtonMapPinMoseUp);
 
   var getOriginalLocationMainPin = function () {
     return {
