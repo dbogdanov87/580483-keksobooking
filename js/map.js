@@ -45,17 +45,23 @@
     setTimeout(removeErrorMessages, TIMEOUT_MESSAGES);
   };
 
-  // отрывает форму для редактирования, рендерит пины и вешает на них обработчики
-  var onStartButtonMapPinMoseUp = function (evt) {
-    var isDraggablePin = evt.target.draggable;
-    if (isDraggablePin || isDraggablePin === undefined) {
+  var isClickOnMainPin;
+  var onStartButtonMapPinMoseDown = function () {
+    isClickOnMainPin = true;
+  };
+  mainPin.addEventListener('mousedown', onStartButtonMapPinMoseDown);
+
+  var onStartButtonMapPinMoseUp = function () {
+    if (isClickOnMainPin) {
       window.backend.loadData(onLoadSuccess, onLoadError);
       map.classList.remove('map--faded');
       enableAdFormAndFields();
-      document.removeEventListener('click', onStartButtonMapPinMoseUp);
+      mainPin.removeEventListener('mousedown', onStartButtonMapPinMoseDown);
+      document.removeEventListener('mouseup', onStartButtonMapPinMoseUp);
     }
   };
-  document.addEventListener('click', onStartButtonMapPinMoseUp);
+
+  document.addEventListener('mouseup', onStartButtonMapPinMoseUp);
 
   var getOriginalLocationMainPin = function () {
     return {
@@ -66,7 +72,7 @@
 
   var originalLocationMainPin = getOriginalLocationMainPin();
 
-  // принимает объект вида - coords {x: 300, y: 200}'
+  // принимает объект вида - coords {x: 300, y: 200}
   var setOriginalLocationMainPin = function () {
     mainPin.style.left = originalLocationMainPin.x + 'px';
     mainPin.style.top = originalLocationMainPin.y + 'px';
