@@ -46,13 +46,16 @@
   };
 
   // отрывает форму для редактирования, рендерит пины и вешает на них обработчики
-  var onStartButtonMapPinMoseUp = function () {
-    window.backend.loadData(onLoadSuccess, onLoadError);
-    map.classList.remove('map--faded');
-    enableAdFormAndFields();
-    document.removeEventListener('mouseup', onStartButtonMapPinMoseUp);
+  var onStartButtonMapPinMoseUp = function (evt) {
+    var isDraggablePin = evt.target.draggable;
+    if (isDraggablePin || isDraggablePin === undefined) {
+      window.backend.loadData(onLoadSuccess, onLoadError);
+      map.classList.remove('map--faded');
+      enableAdFormAndFields();
+      document.removeEventListener('click', onStartButtonMapPinMoseUp);
+    }
   };
-  document.addEventListener('mouseup', onStartButtonMapPinMoseUp);
+  document.addEventListener('click', onStartButtonMapPinMoseUp);
 
   var getOriginalLocationMainPin = function () {
     return {
@@ -63,7 +66,7 @@
 
   var originalLocationMainPin = getOriginalLocationMainPin();
 
-  // принимает объект вида - coords {x: 300, y:200}'
+  // принимает объект вида - coords {x: 300, y: 200}'
   var setOriginalLocationMainPin = function () {
     mainPin.style.left = originalLocationMainPin.x + 'px';
     mainPin.style.top = originalLocationMainPin.y + 'px';
@@ -109,11 +112,11 @@
         y: moveEvt.clientY
       };
       var pinLimitsCoords = {
-        y: {maxTop: 150,
-          maxBottom: 500
+        y: {maxTop: 150 - window.constants.sizePin.PIN_HEIGHT_WITH_TIP,
+          maxBottom: 500 + window.constants.sizePin.PIN_HEIGHT_WITH_TIP
         },
-        x: {maxLeft: 0,
-          maxRight: map.clientWidth - mainPin.offsetWidth // ширина окна мапы - ширина пина
+        x: {maxLeft: -(window.constants.sizePin.HALF_PIN),
+          maxRight: map.clientWidth - window.constants.sizePin.HALF_PIN
         }
       };
 

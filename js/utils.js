@@ -2,16 +2,13 @@
 
 (function () {
   var mainPin = document.querySelector('.map__pin--main');
-  var HEIGHT_TIP = 22;
-  var HALF_PIN = parseInt((mainPin.clientWidth / 2), 10);
-  var PIN_HEIGHT_WITH_TIP = mainPin.clientHeight + HEIGHT_TIP;
   var addressInputElement = document.querySelector('#address');
 
   window.utils = {
     getMainPinPositionTip: function () {
       return {
-        x: mainPin.offsetLeft + HALF_PIN,
-        y: mainPin.offsetTop + PIN_HEIGHT_WITH_TIP
+        x: mainPin.offsetLeft + window.constants.sizePin.HALF_PIN,
+        y: mainPin.offsetTop + window.constants.sizePin.PIN_HEIGHT_WITH_TIP
       };
     },
     makeElement: function (tagName, className, text) {
