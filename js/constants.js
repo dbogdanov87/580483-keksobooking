@@ -13,7 +13,7 @@
     },
     sizePin: {
       HEIGHT_TIP: 22,
-      HALF_PIN: parseInt((mainPin.clientWidth / 2), 10),
+      HALF_PIN: Math.round(mainPin.clientWidth / 2),
       PIN_HEIGHT_WITH_TIP: mainPin.clientHeight + HEIGHT_TIP
     }
   };

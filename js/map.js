@@ -118,10 +118,12 @@
         y: moveEvt.clientY
       };
       var pinLimitsCoords = {
-        y: {maxTop: 150 - window.constants.sizePin.PIN_HEIGHT_WITH_TIP,
-          maxBottom: 500 + window.constants.sizePin.PIN_HEIGHT_WITH_TIP
+        y: {
+          maxTop: 150 - window.constants.sizePin.PIN_HEIGHT_WITH_TIP,
+          maxBottom: 500 - window.constants.sizePin.PIN_HEIGHT_WITH_TIP
         },
-        x: {maxLeft: -(window.constants.sizePin.HALF_PIN),
+        x: {
+          maxLeft: -window.constants.sizePin.HALF_PIN,
           maxRight: map.clientWidth - window.constants.sizePin.HALF_PIN
         }
       };
